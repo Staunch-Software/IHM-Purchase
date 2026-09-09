@@ -225,6 +225,10 @@ if __name__ == "__main__":
     from datetime import datetime, timedelta
 
     from app.core.database import SessionLocal
+    from app.core.logging import setup_logging
+    
+    # Initialize logging so stdout shows INFO logs
+    setup_logging()
 
     parser = argparse.ArgumentParser(description="IHM Purchase scraper")
     parser.add_argument("--list-only", action="store_true", help="Scrape the list grid only, skip PO detail pages")
