@@ -1,0 +1,98 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  z-index: var(--z-sheet);
+  background: var(--overlay-bg);
+  backdrop-filter: var(--overlay-blur);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface-base);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xl);
+  transform: translateX(100%);
+  transition: transform var(--transition-slow);
+}
+
+.panel:focus {
+  outline: none;
+}
+
+/* Phase classes — transition (not animation) so the exit interpolates from
+   wherever the panel currently sits rather than restarting from 100%. */
+.entering,
+.exiting {
+  opacity: 0;
+}
+
+.entering .panel,
+.exiting .panel {
+  transform: translateX(100%);
+}
+
+.open {
+  opacity: 1;
+}
+
+.open .panel {
+  transform: translateX(0);
+}
+
+/* ── Widths ────────────────────────────────────────────────────────────── */
+
+.wide {
+  width: min(1100px, 94vw);
+}
+
+.full {
+  width: min(1800px, 100vw);
+}
+
+@media (max-width: 768px) {
+  .wide,
+  .full {
+    width: 100%;
+  }
+}
+
+/* ── Slots ─────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+  flex-shrink: 0;
+}
+
+.headerContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* Keeps the sheet's own scroll from chaining out to whatever is behind it */
+  overscroll-behavior: contain;
+  padding: var(--space-5);
+}

@@ -1,0 +1,239 @@
+/* ── App shell ───────────────────────────────────────────────────────────── */
+
+.shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-base);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TOP BAR — Premium 60px navbar
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 60px;
+  padding: 0 var(--space-6);
+  /* Deep navy glass — premium feel, not a plain white bar */
+  background: linear-gradient(
+    180deg,
+    rgba(7, 26, 43, 0.97) 0%,
+    rgba(11, 42, 69, 0.97) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  /* Rich layered shadow: a sharp hairline on bottom + a soft deep glow */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 24px rgba(7, 26, 43, 0.55),
+    0 1px 4px rgba(7, 26, 43, 0.4);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+}
+
+/* ── Brand section ──────────────────────────────────────────────────────── */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  /* Teal glassmorphism — matches login hero logo */
+  background: linear-gradient(
+    140deg,
+    rgba(18, 167, 188, 0.28) 0%,
+    rgba(14, 140, 158, 0.16) 100%
+  );
+  border: 1.5px solid rgba(18, 167, 188, 0.4);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 3px 12px rgba(18, 167, 188, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.brand:hover .brandMark {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 4px 18px rgba(18, 167, 188, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.brandTextGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+
+.brandTag {
+  font-size: 9px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(18, 167, 188, 0.8);
+  line-height: 1;
+}
+
+.brandName {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  /* White-to-teal gradient text — consistent with login page */
+  background: linear-gradient(100deg, #ffffff 30%, #a9e2eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+/* ── Divider ────────────────────────────────────────────────────────────── */
+
+.brandDivider {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.15) 30%,
+    rgba(255, 255, 255, 0.15) 70%,
+    transparent
+  );
+  flex-shrink: 0;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.navLink,
+.navLinkActive {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.navIcon {
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+/* Hover */
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.88);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.navLink:hover .navIcon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Active — glowing pill */
+.navLinkActive {
+  background: rgba(18, 167, 188, 0.12);
+  color: #fff;
+  font-weight: var(--font-weight-semibold);
+  border-color: rgba(18, 167, 188, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(18, 167, 188, 0.15),
+    0 2px 10px rgba(18, 167, 188, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.navLinkActive .navIcon {
+  color: var(--teal-500);
+  filter: drop-shadow(0 0 4px rgba(18, 167, 188, 0.6));
+}
+
+/* Teal bottom accent dot-bar */
+.navLinkActive::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2.5px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--teal-600), var(--teal-400));
+  box-shadow: 0 0 6px rgba(18, 167, 188, 0.7);
+}
+
+/* ── Page content area ──────────────────────────────────────────────────── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .topbar {
+    gap: var(--space-3);
+    padding: 0 var(--space-4);
+    height: 56px;
+  }
+
+  .brandDivider {
+    display: none;
+  }
+
+  .brandTag {
+    display: none;
+  }
+
+  .brandName {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 1921px) {
+  .topbar {
+    padding: 0 var(--space-8);
+  }
+}

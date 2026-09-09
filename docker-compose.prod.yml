@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ihm_purchase}
+    volumes:
+      - ihm_purchase_pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-ihm_purchase}
+      SECRET_KEY: ${SECRET_KEY}
+      SMARTPAL_EMAIL: ${SMARTPAL_EMAIL}
+      SMARTPAL_PASSWORD: ${SMARTPAL_PASSWORD}
+      SCRAPER_CRON_HOUR: ${SCRAPER_CRON_HOUR:-2}
+      SCRAPER_CRON_MINUTE: ${SCRAPER_CRON_MINUTE:-0}
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  ihm_purchase_pgdata:

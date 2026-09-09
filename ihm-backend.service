@@ -1,0 +1,25 @@
+[Unit]
+Description=IHM Purchase FastAPI Backend (Uvicorn)
+After=network.target postgresql.service
+
+[Service]
+# Adjust User/Group to the user that owns the /opt/ihm-purchase directory (e.g., ubuntu, root, or www-data)
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/ihm-purchase/backend
+
+# Use the virtual environment's Python
+Environment="PATH=/opt/ihm-purchase/backend/.venv/bin"
+
+# Load environment variables (DATABASE_URL, SECRET_KEY, etc.)
+EnvironmentFile=/opt/ihm-purchase/backend/.env
+
+# Start the application
+ExecStart=/opt/ihm-purchase/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# Automatically restart if it crashes
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

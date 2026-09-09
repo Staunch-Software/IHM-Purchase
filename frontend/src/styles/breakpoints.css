@@ -1,0 +1,13 @@
+/*
+  Shared breakpoints referenced by every component's media queries so the
+  whole app resizes consistently instead of each page inventing its own.
+  These are documented here as a reference; actual @media rules must
+  repeat the pixel values (CSS custom properties cannot be used inside
+  @media conditions).
+
+  mobile:  <= 480px
+  tablet:  <= 768px
+  laptop:  <= 1280px
+  desktop: <= 1920px
+  2k:      >= 1921px
+*/

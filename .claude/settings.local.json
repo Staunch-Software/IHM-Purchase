@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(grep -viE \"^\\\\S+: *\\(//|\\\\*|/\\\\*\\)\")",
+      "Bash(./.venv/Scripts/python.exe -c ' *)"
+    ]
+  }
+}

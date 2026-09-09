@@ -1,0 +1,292 @@
+/* ============================================================================
+   IHM-Purchase — Design Tokens
+   ----------------------------------------------------------------------------
+   Two layers, and the distinction is load-bearing:
+
+     1. PRIMITIVES  (--ocean-*, --teal-*, --slate-*, --status-*-raw)
+        The raw palette. Names describe the colour, not the job.
+
+     2. SEMANTICS   (--color-*, --surface-*, --text-*, --border-*, --shadow-*)
+        Names describe the job, not the colour.
+
+   INVARIANT: component CSS may reference ONLY semantic tokens. Never reach
+   past them to a primitive. That single rule is what makes the [data-theme]
+   block at the bottom of this file a complete theme swap instead of a
+   whack-a-mole hunt through 14 stylesheets.
+   ========================================================================= */
+
+:root {
+  /* ══ 1. PRIMITIVES ══════════════════════════════════════════════════════ */
+
+  /* Deep Ocean Navy — the primary. Depth, authority, maritime. */
+  --ocean-950: #071A2B;
+  --ocean-900: #0B2A45;
+  --ocean-800: #0E3352;
+  --ocean-700: #123A5C;
+  --ocean-600: #1A4E78;
+  --ocean-500: #2C6E9B;
+  --ocean-400: #3E86B5;
+  --ocean-300: #7FAFCE;
+  --ocean-200: #B9D3E5;
+  --ocean-100: #DCE9F2;
+  --ocean-50: #EEF4F9;
+
+  /* Premium Teal — the accent. Used sparingly and deliberately. */
+  --teal-800: #0A6B7A;
+  --teal-700: #0E8C9E;
+  --teal-600: #12A7BC;
+  --teal-500: #22B8CC;
+  --teal-200: #A9E2EB;
+  --teal-100: #D3F0F5;
+  --teal-50: #ECF9FB;
+
+  /* Cool blue-grey neutrals — never pure grey; every step carries ocean tint */
+  --slate-950: #0D1F30;
+  --slate-800: #2B3F52;
+  --slate-700: #43596E;
+  --slate-500: #7B90A3;
+  --slate-400: #A8B8C8;
+  --slate-300: #CBD6E0;
+  --slate-200: #E1E8EF;
+  --slate-100: #EEF3F7;
+  --slate-50: #F7F9FB;
+  --white: #ffffff;
+
+  /* Status — refined enterprise, deliberately desaturated */
+  --status-green: #157F52;
+  --status-green-soft: #E8F5EE;
+  --status-green-line: #B4DEC8;
+  --status-amber: #B4750E;
+  --status-amber-soft: #FDF4E3;
+  --status-amber-line: #EFD8A6;
+  --status-red: #C0392E;
+  --status-red-soft: #FCEDEB;
+  --status-red-line: #F0C4BF;
+  --status-cyan: #12849B;
+  --status-cyan-soft: #E7F5F8;
+  --status-cyan-line: #B4DDE6;
+  --status-slate: #5A7286;
+  --status-slate-soft: #EEF3F7;
+  --status-slate-line: #D6E0E9;
+
+  /* ══ 2. SEMANTICS ═══════════════════════════════════════════════════════ */
+
+  /* — Brand / primary action — */
+  --color-primary: var(--ocean-900);
+  --color-primary-hover: var(--ocean-800);
+  --color-primary-active: var(--ocean-950);
+  --color-primary-soft: var(--ocean-50);
+  --color-primary-soft-hover: var(--ocean-100);
+  --color-primary-line: var(--ocean-200);
+  --color-on-primary: var(--white);
+
+  --color-secondary: var(--ocean-500);
+  --color-secondary-hover: var(--ocean-600);
+
+  --color-accent: var(--teal-700);
+  --color-accent-hover: var(--teal-800);
+  --color-accent-strong: var(--teal-600);
+  --color-accent-soft: var(--teal-50);
+  --color-accent-line: var(--teal-200);
+
+  /* Reserved for the login hero and the brand mark only — not general chrome.
+     Overusing gradient is the fastest way to make enterprise UI look cheap. */
+  --brand-mark-gradient: linear-gradient(140deg, var(--ocean-700), var(--ocean-900) 55%, var(--ocean-950));
+  --brand-hero-gradient: linear-gradient(105deg, rgba(7, 26, 43, 0.94), rgba(11, 42, 69, 0.86) 42%, rgba(14, 51, 82, 0.68));
+
+  /* — Surfaces, lowest to highest — */
+  --surface-sunken: var(--slate-100);
+  --surface-base: var(--slate-50);
+  --surface-raised: var(--white);
+  --surface-elevated: var(--white);
+  --surface-inset: var(--slate-100);
+  --surface-hover: var(--slate-100);
+  --surface-active: var(--ocean-50);
+  --surface-glass: rgba(255, 255, 255, 0.86);
+  --surface-inverse: var(--ocean-900);
+
+  /* — Borders — */
+  --border-subtle: var(--slate-200);
+  --border-default: var(--slate-300);
+  --border-strong: var(--slate-400);
+  --border-inverse: rgba(255, 255, 255, 0.16);
+
+  /* — Text — */
+  --text-primary: var(--slate-950);
+  --text-secondary: var(--slate-700);
+  --text-muted: var(--slate-500);
+  --text-disabled: var(--slate-400);
+  --text-accent: var(--teal-800);
+  --text-on-primary: var(--white);
+  --text-on-inverse: rgba(255, 255, 255, 0.92);
+  --text-on-inverse-muted: rgba(255, 255, 255, 0.62);
+
+  /* — Status: fg / soft background / hairline — */
+  --color-success: var(--status-green);
+  --color-success-bg: var(--status-green-soft);
+  --color-success-border: var(--status-green-line);
+  --color-warning: var(--status-amber);
+  --color-warning-bg: var(--status-amber-soft);
+  --color-warning-border: var(--status-amber-line);
+  --color-danger: var(--status-red);
+  --color-danger-hover: #a72f26;
+  --color-danger-bg: var(--status-red-soft);
+  --color-danger-border: var(--status-red-line);
+  --color-info: var(--status-cyan);
+  --color-info-bg: var(--status-cyan-soft);
+  --color-info-border: var(--status-cyan-line);
+  --color-neutral: var(--status-slate);
+  --color-neutral-bg: var(--status-slate-soft);
+  --color-neutral-border: var(--status-slate-line);
+
+  /* — Data grid — its own tokens because density tuning is a separate axis
+       from general surface colour, and the grid is the product's centrepiece. */
+  --grid-header-bg: var(--slate-100);
+  --grid-header-text: var(--slate-700);
+  --grid-row-bg: var(--surface-raised);
+  --grid-row-alt-bg: #FBFCFD;
+  --grid-row-hover-bg: var(--ocean-50);
+  --grid-row-selected-bg: var(--teal-50);
+  --grid-line: var(--slate-200);
+  --grid-line-strong: var(--slate-300);
+  --grid-row-height: 38px;
+  --grid-header-height: 40px;
+
+  /* — Form controls — */
+  --input-bg: var(--surface-raised);
+  --input-bg-hover: var(--white);
+  --input-bg-disabled: var(--slate-100);
+  --input-border: var(--slate-300);
+  --input-border-hover: var(--slate-400);
+  --input-border-focus: var(--color-accent);
+  --input-placeholder: var(--text-disabled);
+  --input-ring: 0 0 0 3px rgba(18, 167, 188, 0.16);
+  --input-ring-danger: 0 0 0 3px rgba(192, 57, 46, 0.14);
+
+  /* — Overlay — */
+  --overlay-bg: rgba(7, 26, 43, 0.42);
+  --overlay-blur: blur(3px);
+
+  /* ══ Spacing ════════════════════════════════════════════════════════════ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ══ Typography ═════════════════════════════════════════════════════════
+     Tuned for density: 60+ columns means vertical space is the scarce
+     resource. Sizes are smaller than a marketing site would use, on purpose. */
+  --font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Consolas, monospace;
+
+  --font-size-2xs: 10.5px;  /* column headers, eyebrows */
+  --font-size-xs: 11.5px;   /* metadata, badges */
+  --font-size-sm: 12.5px;   /* table data — the most-read size in the app */
+  --font-size-base: 13.5px; /* body, inputs */
+  --font-size-md: 15px;     /* section titles */
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;     /* page title */
+  --font-size-2xl: 28px;    /* login headline only */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.22;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.55;
+
+  --tracking-tighter: -0.025em;
+  --tracking-tight: -0.012em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.055em;
+  --tracking-wider: 0.09em;
+
+  /* ══ Radius ═════════════════════════════════════════════════════════════
+     Restrained. Enterprise data UI reads as sloppy when everything is a pill. */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* ══ Elevation ══════════════════════════════════════════════════════════
+     Navy-tinted, never neutral black — black shadows over a blue-grey ground
+     read as dirty. Small=inputs, md=popovers, lg=dropdowns, xl=slide-over. */
+  --shadow-xs: 0 1px 2px rgba(11, 42, 69, 0.05);
+  --shadow-sm: 0 1px 2px rgba(11, 42, 69, 0.06), 0 1px 3px rgba(11, 42, 69, 0.05);
+  --shadow-md: 0 2px 4px rgba(11, 42, 69, 0.05), 0 8px 20px -6px rgba(11, 42, 69, 0.12);
+  --shadow-lg: 0 4px 8px rgba(11, 42, 69, 0.06), 0 16px 36px -10px rgba(11, 42, 69, 0.16);
+  --shadow-xl: 0 8px 16px rgba(11, 42, 69, 0.08), 0 32px 64px -16px rgba(11, 42, 69, 0.22);
+  --shadow-primary: 0 2px 6px rgba(11, 42, 69, 0.18);
+  --shadow-pinned-col: 6px 0 8px -6px rgba(11, 42, 69, 0.18);
+  --focus-ring: 0 0 0 3px rgba(18, 167, 188, 0.28);
+
+  /* ══ Motion ═════════════════════════════════════════════════════════════ */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ══ Stacking order ═════════════════════════════════════════════════════
+     Centralised so nothing has to guess. Note --z-thead sets a stacking
+     context, so pinned-cell/pinned-header only compete within their own
+     row group — see DataTable.module.css. */
+  --z-pinned-cell: 2;
+  --z-pinned-header: 3;
+  --z-header-popover: 5;
+  --z-header-drag: 10;
+  --z-thead: 20;
+  --z-topbar: 40;
+  --z-dropdown: 50;
+  --z-sheet: 80;
+  --z-dialog: 90;
+  --z-popover: 100;
+  --z-tooltip: 110;
+}
+
+/* ============================================================================
+   Dark theme — intentionally not wired to any UI control yet.
+   Because every component references only the semantics above, enabling dark
+   mode is exactly this block plus a toggle that sets [data-theme="dark"].
+   Values are drafted, not tuned; verify contrast before shipping it.
+   ==========================================================================
+[data-theme="dark"] {
+  --surface-sunken: #050F1A;
+  --surface-base: #071A2B;
+  --surface-raised: #0B2438;
+  --surface-elevated: #102D44;
+  --surface-inset: #050F1A;
+  --surface-hover: #12314A;
+  --surface-active: #163A56;
+  --surface-glass: rgba(11, 36, 56, 0.86);
+
+  --border-subtle: #17334B;
+  --border-default: #22455F;
+  --border-strong: #345C78;
+
+  --text-primary: #E8F0F6;
+  --text-secondary: #A8C0D2;
+  --text-muted: #7290A8;
+  --text-disabled: #4C6B84;
+
+  --color-primary: var(--ocean-400);
+  --color-primary-hover: var(--ocean-300);
+  --color-primary-soft: #12314A;
+  --color-accent: var(--teal-500);
+
+  --grid-header-bg: #0E2A40;
+  --grid-row-bg: #0B2438;
+  --grid-row-alt-bg: #0C2739;
+  --grid-row-hover-bg: #12314A;
+  --grid-line: #17334B;
+
+  --overlay-bg: rgba(3, 10, 18, 0.66);
+}
+*/

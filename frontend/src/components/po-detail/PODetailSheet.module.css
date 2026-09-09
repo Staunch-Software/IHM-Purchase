@@ -1,0 +1,330 @@
+/* Overlay, panel and motion now live in ui/Sheet.module.css — this file owns
+   only the PO-specific content inside the slide-over. */
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.poLabel {
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.poNumber {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.vesselChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: var(--surface-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.vesselChip svg {
+  color: var(--color-accent);
+}
+
+.widthToggle {
+  margin-right: var(--space-1);
+}
+
+.exportBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--teal-600);
+  border-radius: var(--radius-md);
+  background: var(--teal-600);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(11, 42, 69, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.exportBtn:hover:not(:disabled) {
+  background: var(--teal-700);
+  border-color: var(--teal-700);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(18, 167, 188, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.exportBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Body ──────────────────────────────────────────────────────────────── */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) 0;
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.poTitle {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--surface-raised);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+/* ── Line items ────────────────────────────────────────────────────────── */
+
+.lineItemsSection {
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  overflow: hidden;
+}
+
+.lineItemsHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lineItemsTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.lineItemsColumnToggle {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-base);
+}
+
+.lineItemsScroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  max-height: 420px;
+}
+
+/* `separate` is required for the sticky identity columns to repaint their
+   borders correctly during horizontal scroll (see DataTable.module.css). The
+   header's heavier bottom rule is therefore expressed per-cell. */
+.lineItemsTable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.lineItemsTable th {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-thead);
+  padding: var(--space-2) var(--space-3);
+  background: var(--grid-header-bg);
+  border-bottom: 1px solid var(--grid-line-strong);
+  text-align: left;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--grid-header-text);
+  white-space: nowrap;
+}
+
+.lineItemsTable td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--grid-line);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.lineItemsTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lineItemsTable tbody tr:hover td {
+  background: var(--grid-row-hover-bg);
+}
+
+/* Without pinned identity columns, scrolling right through 60 columns loses
+   all sense of which row you're reading. */
+.liPinned {
+  position: sticky;
+  background: var(--surface-raised);
+  box-shadow: 1px 0 0 var(--grid-line);
+}
+
+.lineItemsTable th.liPinned {
+  z-index: calc(var(--z-thead) + 1);
+  background: var(--grid-header-bg);
+  box-shadow: 1px 0 0 var(--grid-line-strong);
+}
+
+.lineItemsTable td.liPinned {
+  z-index: var(--z-pinned-cell);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.lineItemsTable tbody tr:hover td.liPinned {
+  background: var(--grid-row-hover-bg);
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyLineItems {
+  padding: var(--space-6);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ── Info sections ─────────────────────────────────────────────────────────
+   auto-fit, NOT a media query. Media queries measure the viewport, not this
+   panel — in an 1100px sheet on a 2560px monitor a max-width query never
+   fires and five sections crush into unreadable columns. */
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.section {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+
+.sectionRemarks {
+  grid-column: 1 / -1;
+  margin-top: var(--space-4);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sectionIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.fieldValue {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.fieldMono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.remarksText {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Navy rounded background -->
+  <rect width="32" height="32" rx="7" fill="#0B2A45"/>
+
+  <!-- Bold "P" letterform -->
+  <text
+    x="6" y="23"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-weight="900"
+    font-size="22"
+    fill="#12A7BC"
+    letter-spacing="-1"
+  >P</text>
+
+  <!-- Anchor hook at bottom of P stem -->
+  <!-- Vertical stem extension -->
+  <line x1="8.5" y1="23" x2="8.5" y2="27" stroke="#12A7BC" stroke-width="2" stroke-linecap="round"/>
+  <!-- Horizontal bar -->
+  <line x1="5.5" y1="27" x2="11.5" y2="27" stroke="#12A7BC" stroke-width="2" stroke-linecap="round"/>
+  <!-- Left curl -->
+  <path d="M5.5 27 Q5 29.5 7.5 29.5" stroke="#12A7BC" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <!-- Right curl -->
+  <path d="M11.5 27 Q12 29.5 9.5 29.5" stroke="#12A7BC" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+  <!-- Teal accent dot (top right) -->
+  <circle cx="26" cy="7" r="3.5" fill="#12A7BC"/>
+  <circle cx="26" cy="7" r="1.5" fill="#0B2A45"/>
+</svg>

@@ -1,0 +1,165 @@
+/* ── Pagination bar ─────────────────────────────────────────────────────── */
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 20px;
+  height: 48px;
+  border-top: 1px solid var(--slate-200);
+  background: var(--surface-raised);
+  flex-shrink: 0;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* ── Rows-per-page selector ─────────────────────────────────────────────── */
+.sizeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sizeText {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sizeSelect {
+  appearance: none;
+  height: 30px;
+  padding: 0 24px 0 10px;
+  border: 1px solid var(--slate-300);
+  border-radius: 7px;
+  background: var(--surface-raised);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%237B90A3' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5L8 10.5L12 6.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sizeSelect:hover { border-color: var(--slate-400); }
+
+.sizeSelect:focus-visible {
+  outline: none;
+  border-color: var(--teal-600);
+  box-shadow: 0 0 0 3px rgba(18, 167, 188, 0.14);
+}
+
+/* ── Divider & summary ──────────────────────────────────────────────────── */
+.divider {
+  width: 1px;
+  height: 16px;
+  background: var(--slate-200);
+  flex-shrink: 0;
+}
+
+.summary {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary b {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.filteredNote { color: var(--text-disabled); }
+
+/* ── Pager buttons ──────────────────────────────────────────────────────── */
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.pageList {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 4px;
+}
+
+.navBtn,
+.pageBtn,
+.pageBtnActive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.navBtn:hover:not(:disabled),
+.pageBtn:hover {
+  background: var(--slate-100);
+  color: var(--text-primary);
+  border-color: var(--slate-200);
+}
+
+.navBtn:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Active page — deep ocean pill */
+.pageBtnActive {
+  background: var(--ocean-900);
+  border-color: var(--ocean-900);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(11, 42, 69, 0.22);
+}
+
+.pageBtnActive:hover { background: var(--ocean-800); }
+
+.ellipsis {
+  min-width: 22px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-disabled);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .bar {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 16px;
+    gap: var(--space-2);
+  }
+  .pager { justify-content: center; }
+}
