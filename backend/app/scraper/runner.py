@@ -62,6 +62,8 @@ async def run_scraper(
     run_type: ScrapeRunType = ScrapeRunType.FULL,
     headless: bool = True,
     max_pos: int | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
 ) -> ScrapeRun:
     """`max_pos` stops the run after that many POs have been ATTEMPTED
     (whether they succeeded or failed) — useful for a small manual
@@ -173,6 +175,8 @@ async def run_scraper(
                         # + completed_po_numbers (finished in a prior crash-restart
                         # attempt this session). For FULL runs initial_skip is empty.
                         skip_po_numbers=initial_skip | completed_po_numbers,
+                        from_date=from_date,
+                        to_date=to_date,
                     )
                 # Completed a full pass through the pager without the browser dying.
                 break
@@ -218,18 +222,46 @@ async def run_scraper(
 if __name__ == "__main__":
     import argparse
     import asyncio
+    from datetime import datetime, timedelta
 
     from app.core.database import SessionLocal
 
     parser = argparse.ArgumentParser(description="IHM Purchase scraper")
     parser.add_argument("--list-only", action="store_true", help="Scrape the list grid only, skip PO detail pages")
+    parser.add_argument("--incremental", action="store_true", help="Skip POs that are already in the database (scrape only new rows)")
+    parser.add_argument("--days-back", type=int, default=30, help="Number of days to look back when running incrementally")
     parser.add_argument("--headed", action="store_true", help="Run with a visible browser window (for debugging)")
     parser.add_argument("--max-pos", type=int, default=None, help="Stop after attempting this many POs")
     args = parser.parse_args()
 
     async def main():
-        run_type = ScrapeRunType.LIST_ONLY if args.list_only else ScrapeRunType.FULL
+        from_date = None
+        to_date = None
+        
+        now = datetime.now()
+        
+        if args.incremental:
+            run_type = ScrapeRunType.INCREMENTAL
+            # Format dates as DD-MMM-YYYY (e.g. 08-Sep-2026)
+            to_date = now.strftime("%d-%b-%Y")
+            from_date = (now - timedelta(days=args.days_back)).strftime("%d-%b-%Y")
+        elif args.list_only:
+            run_type = ScrapeRunType.LIST_ONLY
+            from_date = "01-Jan-2025"
+            to_date = now.strftime("%d-%b-%Y")
+        else:
+            run_type = ScrapeRunType.FULL
+            from_date = "01-Jan-2025"
+            to_date = now.strftime("%d-%b-%Y")
+            
         async with SessionLocal() as db:
-            await run_scraper(db, run_type=run_type, headless=not args.headed, max_pos=args.max_pos)
+            await run_scraper(
+                db, 
+                run_type=run_type, 
+                headless=not args.headed, 
+                max_pos=args.max_pos,
+                from_date=from_date,
+                to_date=to_date
+            )
 
     asyncio.run(main())

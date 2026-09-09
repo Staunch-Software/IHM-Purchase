@@ -190,6 +190,49 @@ async def apply_category_filter_excluding_crew(page: Page) -> None:
     await page.wait_for_timeout(300)
 
 
+async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
+    logger.info(f"Applying date filter: {from_date} to {to_date}")
+    await page.evaluate("""([fd, td]) => {
+        function setDate(labelName, val) {
+            let els = Array.from(document.querySelectorAll('label, span, div, p'));
+            let label = els.find(e => e.childNodes.length === 1 && e.innerText && e.innerText.trim() === labelName);
+            if (!label) {
+                label = els.find(e => e.innerText && e.innerText.trim() === labelName);
+            }
+            if (!label) return;
+            
+            let container = label.parentElement;
+            let input = null;
+            for (let i = 0; i < 4; i++) { // search up to 4 levels up
+                if (!container || container === document.body) break;
+                input = container.querySelector('input[type="text"], input:not([type])');
+                if (input) break;
+                container = container.parentElement;
+            }
+            
+            if (input) {
+                input.focus();
+                input.value = val;
+                input.dispatchEvent(new Event('input', {bubbles:true}));
+                input.dispatchEvent(new Event('change', {bubbles:true}));
+                input.blur();
+                
+                if (window.jQuery) {
+                    let $el = window.jQuery(input);
+                    let kendoDatePicker = $el.data('kendoDatePicker');
+                    if (kendoDatePicker) {
+                        kendoDatePicker.value(val);
+                        kendoDatePicker.trigger("change");
+                    }
+                }
+            }
+        }
+        setDate("From Date", fd);
+        setDate("To Date", td);
+    }""", [from_date, to_date])
+    await page.wait_for_timeout(500)
+
+
 async def run_show_query(page: Page) -> None:
     await page.locator(".btn-icon-apply-search-result").click()
     await page.wait_for_timeout(2500)
@@ -545,6 +588,8 @@ async def fetch_po_list(
     scrape_details: bool = True,
     on_po_scraped: Callable[[dict], Awaitable[None]] | None = None,
     skip_po_numbers: set[str] | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
 ) -> list[dict]:
     """Top-level entrypoint. Currently DOM-scrapes; swap the body for a
     direct JSON API call here if a usable JSON endpoint is ever found,
@@ -553,6 +598,10 @@ async def fetch_po_list(
         raise RuntimeError("Could not open PO Overview page.")
     await click_finally_approved_tab(page)
     await apply_category_filter_excluding_crew(page)
+    
+    if from_date and to_date:
+        await apply_date_filter(page, from_date, to_date)
+        
     await run_show_query(page)
     return await extract_list_rows(
         page, scrape_details=scrape_details, on_po_scraped=on_po_scraped, skip_po_numbers=skip_po_numbers
