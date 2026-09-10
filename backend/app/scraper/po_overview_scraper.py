@@ -203,7 +203,7 @@ async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
             
             let container = label.parentElement;
             let input = null;
-            for (let i = 0; i < 4; i++) { // search up to 4 levels up
+            for (let i = 0; i < 4; i++) {
                 if (!container || container === document.body) break;
                 input = container.querySelector('input[type="text"], input:not([type])');
                 if (input) break;
@@ -221,8 +221,12 @@ async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
                     let $el = window.jQuery(input);
                     let kendoDatePicker = $el.data('kendoDatePicker');
                     if (kendoDatePicker) {
-                        kendoDatePicker.value(val);
-                        kendoDatePicker.trigger("change");
+                        // Kendo requires a native Date object, otherwise it rejects it and reverts to default!
+                        let d = new Date(val);
+                        if (!isNaN(d.getTime())) {
+                            kendoDatePicker.value(d);
+                            kendoDatePicker.trigger("change");
+                        }
                     }
                 }
             }
@@ -230,6 +234,21 @@ async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
         setDate("From Date", fd);
         setDate("To Date", td);
     }""", [from_date, to_date])
+    
+    # Also try native playwright fill as a backup for the UI
+    try:
+        from_input = page.get_by_role("textbox", name="From Date")
+        if await from_input.count() > 0:
+            await from_input.fill(from_date)
+            await from_input.press("Enter")
+        
+        to_input = page.get_by_role("textbox", name="To Date")
+        if await to_input.count() > 0:
+            await to_input.fill(to_date)
+            await to_input.press("Enter")
+    except Exception:
+        pass
+        
     await page.wait_for_timeout(500)
 
 
