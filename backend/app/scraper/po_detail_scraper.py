@@ -163,7 +163,7 @@ async def wait_for_detail_page_ready(page: Page) -> None:
                 const g = candidates[0];
                 return g && g.querySelectorAll("tbody tr td").length > 0;
             }""",
-            timeout=5000
+            timeout=30000
         )
     except Exception:
         logger.warning("Detail page's item grid did not appear within timeout.")
