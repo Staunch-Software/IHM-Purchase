@@ -1,10 +1,32 @@
 import re
+from datetime import datetime
+from pathlib import Path
 
 from playwright.async_api import Page
 from playwright.async_api import TimeoutError as PlaywrightTimeout
 
 from app.core.config import settings
 from app.core.logging import logger
+
+_FAILURE_DIAGNOSTICS_DIR = Path(__file__).resolve().parents[2] / "scratch_diagnostics" / "login_failures"
+
+
+async def _dump_failure_diagnostics(page: Page) -> None:
+    """Best-effort capture of what's actually on screen when login fails,
+    so a stuck/unexpected Microsoft SSO page (MFA challenge, automation
+    verification, etc.) can be diagnosed after the fact instead of guessed
+    at blind from a bare timeout in the logs."""
+    try:
+        _FAILURE_DIAGNOSTICS_DIR.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S%f")
+        await page.screenshot(path=str(_FAILURE_DIAGNOSTICS_DIR / f"{stamp}.png"), full_page=True)
+        (_FAILURE_DIAGNOSTICS_DIR / f"{stamp}.txt").write_text(
+            f"url: {page.url}\ntitle: {await page.title()}\n\n{await page.content()}",
+            encoding="utf-8",
+        )
+        logger.error(f"Login failure diagnostics saved: {stamp} (url was {page.url})")
+    except Exception as diag_error:
+        logger.warning(f"Could not save login failure diagnostics: {diag_error}")
 
 
 async def login(page: Page) -> bool:
@@ -51,4 +73,5 @@ async def login(page: Page) -> bool:
 
     except Exception as e:
         logger.error(f"Login error: {e}")
+        await _dump_failure_diagnostics(page)
         return False
