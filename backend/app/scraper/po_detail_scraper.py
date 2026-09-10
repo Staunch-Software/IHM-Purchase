@@ -150,9 +150,24 @@ async def wait_for_detail_page_ready(page: Page) -> None:
         pass
 
     try:
-        await page.wait_for_selector(".k-grid tbody tr td", timeout=30000)
+        # The DOM contains multiple .k-grid elements (e.g. the main list grid).
+        # A generic wait for ".k-grid tbody tr td" often matches the wrong grid
+        # or times out, causing a 30-second delay per PO. 
+        # Waiting for a header we know exists in the item grid ensures we target the right one.
+        await page.wait_for_function(
+            """() => {
+                const grids = Array.from(document.querySelectorAll(".k-grid"));
+                const candidates = grids.filter(g => g.offsetWidth > 0 && g.querySelector("tbody tr"));
+                if (candidates.length === 0) return false;
+                candidates.sort((a, b) => b.querySelectorAll("thead th").length - a.querySelectorAll("thead th").length);
+                const g = candidates[0];
+                return g && g.querySelectorAll("tbody tr td").length > 0;
+            }""",
+            timeout=5000
+        )
     except Exception:
         logger.warning("Detail page's item grid did not appear within timeout.")
+        
     try:
         await page.wait_for_selector(_PROCESSING_OVERLAY_SELECTOR, state="hidden", timeout=10000)
     except Exception:
