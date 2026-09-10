@@ -103,6 +103,7 @@ async def run_scraper(
             await upsert_po_list_row(db, record)
         except Exception as e:
             logger.error(f"List upsert failed for {po_number}: {e}")
+            await db.rollback()
             db.add(ScrapeRowError(scrape_run_id=run.id, po_number=po_number, stage="list_extract", error_message=str(e)))
             await db.commit()
             failed += 1
@@ -125,6 +126,7 @@ async def run_scraper(
                 await upsert_po_detail(db, po_number, header_fields, line_items or [])
             except Exception as e:
                 logger.error(f"Detail upsert failed for {po_number}: {e}")
+                await db.rollback()
                 db.add(ScrapeRowError(scrape_run_id=run.id, po_number=po_number, stage="detail_extract", error_message=str(e)))
                 await db.commit()
                 failed += 1
@@ -209,6 +211,7 @@ async def run_scraper(
 
     except Exception as e:
         logger.error(f"Scrape run crashed: {e}")
+        await db.rollback()
         run.status = ScrapeRunStatus.FAILED
         run.error_summary = str(e)
         run.pos_succeeded = succeeded
