@@ -236,6 +236,8 @@ if __name__ == "__main__":
     parser.add_argument("--days-back", type=int, default=30, help="Number of days to look back when running incrementally")
     parser.add_argument("--headed", action="store_true", help="Run with a visible browser window (for debugging)")
     parser.add_argument("--max-pos", type=int, default=None, help="Stop after attempting this many POs")
+    parser.add_argument("--from-date", type=str, default=None, help="Start date (DD-MMM-YYYY) for FULL scrape (defaults to 01-Jan-2010)")
+    parser.add_argument("--to-date", type=str, default=None, help="End date (DD-MMM-YYYY) for FULL scrape (defaults to today)")
     args = parser.parse_args()
 
     async def main():
@@ -251,12 +253,12 @@ if __name__ == "__main__":
             from_date = (now - timedelta(days=args.days_back)).strftime("%d-%b-%Y")
         elif args.list_only:
             run_type = ScrapeRunType.LIST_ONLY
-            from_date = "01-Jan-2025"
-            to_date = now.strftime("%d-%b-%Y")
+            from_date = args.from_date or "01-Jan-2010"
+            to_date = args.to_date or now.strftime("%d-%b-%Y")
         else:
             run_type = ScrapeRunType.FULL
-            from_date = "01-Jan-2025"
-            to_date = now.strftime("%d-%b-%Y")
+            from_date = args.from_date or "01-Jan-2010"
+            to_date = args.to_date or now.strftime("%d-%b-%Y")
             
         async with SessionLocal() as db:
             await run_scraper(
