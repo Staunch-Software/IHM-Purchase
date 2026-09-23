@@ -499,6 +499,9 @@ async def extract_list_rows(
 
     try:
         await page.wait_for_selector(".k-grid-content-locked tbody tr td", timeout=15000)
+        pager_text = await page.evaluate("() => { const el = document.querySelector('.k-pager-info'); return el ? el.innerText.trim() : ''; }")
+        if pager_text:
+            logger.info(f"Grid loaded: {pager_text}")
     except Exception:
         logger.warning("No grid rows appeared after Show — the filtered result set may genuinely be empty.")
 
