@@ -190,6 +190,7 @@
   margin-bottom: var(--space-3);
   flex-shrink: 0;
   position: relative;
+  z-index: 30; /* Keep higher than --z-thead (20) */
 }
 
 /* ── Search ─────────────────────────────────────────────────────────────── */

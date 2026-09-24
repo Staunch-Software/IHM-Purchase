@@ -26,7 +26,7 @@ import { TablePagination } from "./TablePagination.jsx";
 
 const STORAGE_KEY_PREFIX = "ihm_purchase_column_order:";
 const VISIBILITY_STORAGE_KEY_PREFIX = "ihm_purchase_column_visibility:";
-const PAGE_SIZE_OPTIONS = [10, 50, 100];
+const PAGE_SIZE_OPTIONS = [10, 50, 100, 200, 500];
 const DEFAULT_PAGE_SIZE = 50;
 
 function loadColumnOrder(storageKey, columns) {

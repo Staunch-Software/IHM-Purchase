@@ -165,6 +165,7 @@ async def upsert_po_detail(db: AsyncSession, po_number: str, header_fields: dict
         if not li:
             li = POLineItem(purchase_order=po, s_no=s_no)
             db.add(li)
+            existing_by_sno[s_no] = li
         li.part_number = item.get("part_number")
         li.item_description = item.get("item_description")
         li.rob = _parse_number(item.get("rob"))

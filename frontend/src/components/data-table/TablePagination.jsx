@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Check, X } from "lucide-react";
 
 import styles from "./TablePagination.module.css";
 
@@ -32,6 +33,11 @@ export function TablePagination({
   onPageChange,
   onPageSizeChange,
 }) {
+  const [isInputtingCustom, setIsInputtingCustom] = useState(false);
+  const [customVal, setCustomVal] = useState("");
+
+  const isCurrentCustom = !pageSizeOptions.includes(pageSize);
+
   const first = rowCount === 0 ? 0 : pageIndex * pageSize + 1;
   const last = Math.min((pageIndex + 1) * pageSize, rowCount);
   const isFiltered = typeof totalRowCount === "number" && totalRowCount > rowCount;
@@ -46,8 +52,17 @@ export function TablePagination({
           <span className={styles.sizeText}>Rows</span>
           <select
             className={styles.sizeSelect}
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            value={isInputtingCustom ? "custom" : pageSize}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "custom") {
+                setIsInputtingCustom(true);
+                setCustomVal("");
+              } else {
+                setIsInputtingCustom(false);
+                onPageSizeChange(Number(val));
+              }
+            }}
             aria-label="Rows per page"
           >
             {pageSizeOptions.map((size) => (
@@ -55,7 +70,60 @@ export function TablePagination({
                 {size}
               </option>
             ))}
+            {isCurrentCustom && !isInputtingCustom && (
+              <option value={pageSize}>{pageSize}</option>
+            )}
+            <option value="custom">Custom</option>
           </select>
+          
+          {isInputtingCustom && (
+            <div className={styles.customWrap}>
+              <input
+                type="number"
+                className={styles.customSizeInput}
+                value={customVal}
+                onChange={(e) => setCustomVal(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const num = Number(customVal);
+                    if (num > 0) {
+                      onPageSizeChange(num);
+                      setIsInputtingCustom(false);
+                    }
+                  } else if (e.key === "Escape") {
+                    setIsInputtingCustom(false);
+                  }
+                }}
+                placeholder="Qty"
+                min={1}
+                autoFocus
+              />
+              <button
+                type="button"
+                className={styles.customActionBtn}
+                onClick={() => {
+                  const num = Number(customVal);
+                  if (num > 0) {
+                    onPageSizeChange(num);
+                    setIsInputtingCustom(false);
+                  }
+                }}
+                aria-label="Apply custom size"
+              >
+                <Check size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                className={styles.customActionBtn}
+                onClick={() => {
+                  setIsInputtingCustom(false);
+                }}
+                aria-label="Cancel custom size"
+              >
+                <X size={14} strokeWidth={2.5} />
+              </button>
+            </div>
+          )}
         </label>
 
         <span className={styles.divider} aria-hidden="true" />
