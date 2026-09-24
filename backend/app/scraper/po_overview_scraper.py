@@ -211,17 +211,10 @@ async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
             }
             
             if (input) {
-                input.focus();
-                input.value = val;
-                input.dispatchEvent(new Event('input', {bubbles:true}));
-                input.dispatchEvent(new Event('change', {bubbles:true}));
-                input.blur();
-                
                 if (window.jQuery) {
                     let $el = window.jQuery(input);
                     let kendoDatePicker = $el.data('kendoDatePicker');
                     if (kendoDatePicker) {
-                        // Kendo requires a native Date object, otherwise it rejects it and reverts to default!
                         let d = new Date(val);
                         if (!isNaN(d.getTime())) {
                             kendoDatePicker.value(d);
@@ -229,27 +222,39 @@ async def apply_date_filter(page: Page, from_date: str, to_date: str) -> None:
                         }
                     }
                 }
+                
+                input.focus();
+                input.value = val;
+                input.dispatchEvent(new Event('input', {bubbles:true}));
+                input.dispatchEvent(new Event('change', {bubbles:true}));
+                input.blur();
             }
         }
         setDate("From Date", fd);
         setDate("To Date", td);
     }""", [from_date, to_date])
     
-    # Also try native playwright fill as a backup for the UI
+    # Try a completely brute-force fallback using playwright to type it in character by character
     try:
-        from_input = page.get_by_role("textbox", name="From Date")
-        if await from_input.count() > 0:
-            await from_input.fill(from_date)
-            await from_input.press("Enter")
-        
-        to_input = page.get_by_role("textbox", name="To Date")
-        if await to_input.count() > 0:
-            await to_input.fill(to_date)
-            await to_input.press("Enter")
+        from_inputs = await page.locator("label:has-text('From Date') + * input, input[name*='FromDate'], input[id*='FromDate']").all()
+        if from_inputs:
+            await from_inputs[0].click()
+            await page.keyboard.press("Control+A")
+            await page.keyboard.press("Backspace")
+            await from_inputs[0].type(from_date, delay=50)
+            await page.keyboard.press("Enter")
+            
+        to_inputs = await page.locator("label:has-text('To Date') + * input, input[name*='ToDate'], input[id*='ToDate']").all()
+        if to_inputs:
+            await to_inputs[0].click()
+            await page.keyboard.press("Control+A")
+            await page.keyboard.press("Backspace")
+            await to_inputs[0].type(to_date, delay=50)
+            await page.keyboard.press("Enter")
     except Exception:
         pass
         
-    await page.wait_for_timeout(500)
+    await page.wait_for_timeout(1000)
 
 
 async def run_show_query(page: Page) -> None:
