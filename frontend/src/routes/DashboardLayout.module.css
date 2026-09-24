@@ -4,7 +4,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--surface-base);
+  background: linear-gradient(135deg, #F0F4F8 0%, #DCE9F2 100%);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

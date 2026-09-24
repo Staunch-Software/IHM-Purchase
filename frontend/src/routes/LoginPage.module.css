@@ -307,10 +307,11 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-7) var(--space-6);
-  background: var(--surface-raised);
-  /* Subtle left border to clearly separate the two panes */
-  border-left: 1px solid var(--border-subtle);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  backdrop-filter: blur(30px);
   position: relative;
+  box-shadow: -10px 0 40px rgba(11, 42, 69, 0.15);
+  z-index: 10;
 }
 
 /* Very subtle noise texture via a layered gradient (no image needed) */
