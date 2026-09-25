@@ -1,5 +1,6 @@
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { useState } from "react";
+import { Select } from "../../components/ui/Select.jsx";
 
 import styles from "./UserManagement.module.css";
 
@@ -111,17 +112,17 @@ export function UserFormFields({ form, setForm, isEditing }) {
         <label className={styles.formLabel} htmlFor="user-role">
           Role
         </label>
-        <div className={styles.inputWrap}>
-          <ShieldCheck size={15} strokeWidth={1.75} className={styles.inputIcon} aria-hidden="true" />
-          <select
-            id="user-role"
-            className={styles.formInput}
+        <div className={styles.customRoleSelectWrap}>
+          <Select
             value={form.role}
-            onChange={(e) => set("role", e.target.value)}
-          >
-            <option value="user">Normal User</option>
-            <option value="admin">Admin</option>
-          </select>
+            onChange={(v) => set("role", v)}
+            options={[
+              { value: "user", label: "Normal User" },
+              { value: "admin", label: "Admin" }
+            ]}
+            icon={<ShieldCheck size={15} strokeWidth={1.75} />}
+            className={styles.customRoleSelect}
+          />
         </div>
       </div>
 

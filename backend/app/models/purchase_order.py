@@ -24,6 +24,7 @@ class PurchaseOrder(Base):
     items_count: Mapped[int | None] = mapped_column()
     title: Mapped[str | None] = mapped_column(String(500))
     vendor_name: Mapped[str | None] = mapped_column(String(255))
+    vendor_email: Mapped[str | None] = mapped_column(String(255))
     vendor_reference: Mapped[str | None] = mapped_column(String(255))
     base_currency_amount: Mapped[float | None] = mapped_column(Numeric(18, 2))
     currency: Mapped[str | None] = mapped_column(String(16))

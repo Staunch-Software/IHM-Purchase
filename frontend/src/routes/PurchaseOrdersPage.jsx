@@ -8,6 +8,8 @@ import { DEFAULT_VISIBLE_COLUMNS, poColumns } from "../components/data-table/col
 import { PODetailSheet } from "../components/po-detail/PODetailSheet.jsx";
 import { usePurchaseOrders } from "../hooks/usePurchaseOrders.js";
 import { useAuth } from "../lib/auth.jsx";
+import { api } from "../lib/api.js";
+import { formatDate, formatMoney } from "../lib/format.js";
 import styles from "./PurchaseOrdersPage.module.css";
 
 export function PurchaseOrdersPage() {
@@ -41,90 +43,249 @@ export function PurchaseOrdersPage() {
 
   const handleExport = useCallback(async () => {
     if (!tableInstance) return;
-    const ExcelJSModule = await import("exceljs/dist/exceljs.min.js");
-    const ExcelJS = ExcelJSModule.default || window.ExcelJS;
-    const visibleColumns = tableInstance.getVisibleLeafColumns();
-    const exportRows = tableInstance.getPrePaginationRowModel().rows;
+    
+    document.body.style.cursor = "wait";
 
-    const headers = visibleColumns.map(c => String(c.columnDef.header || c.id));
-    const dataRows = exportRows.map(row =>
-      visibleColumns.map(c => {
-        const val = row.getValue(c.id);
-        return val === null || val === undefined ? "" : val;
-      })
-    );
+    try {
+      const ExcelJSModule = await import("exceljs/dist/exceljs.min.js");
+      const ExcelJS = ExcelJSModule.default || window.ExcelJS;
+      const { SMARTPAL_COLUMNS } = await import("../components/po-detail/POLineItemsTable.jsx");
+      
+      const exportRows = tableInstance.getPrePaginationRowModel().rows;
+      const visibleColumns = tableInstance.getVisibleLeafColumns();
+      const poNumbers = exportRows.map(r => r.getValue("po_number"));
+      
+      // Fetch details in chunks of 50 to avoid massive payloads
+      const allDetails = [];
+      for (let i = 0; i < poNumbers.length; i += 50) {
+        const chunk = poNumbers.slice(i, i + 50);
+        try {
+          const res = await api.post("/po/bulk-details", { po_numbers: chunk });
+          allDetails.push(...res);
+        } catch (err) {
+          console.error("Failed to fetch bulk details", err);
+        }
+      }
 
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = "IHM-Purchase";
-    const sheet = workbook.addWorksheet("Purchase Orders", {
-      views: [{ state: "frozen", ySplit: 1 }],  // freeze header row
-    });
+      const poMap = new Map(allDetails.map(d => [d.po_number, d]));
 
-    // ── Column definitions with auto-fit widths ──────────────────────────────
-    sheet.columns = headers.map((h, colIdx) => {
-      const maxLen = Math.max(
-        h.length,
-        ...dataRows.map(row => String(row[colIdx] ?? "").length)
-      );
-      return { header: h, key: String(colIdx), width: Math.min(maxLen + 3, 42) };
-    });
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "IHM-Purchase";
+      const sheet = workbook.addWorksheet("Purchase Orders", {
+        views: [{ state: "frozen", ySplit: 1, xSplit: 1 }],
+      });
 
-    // ── Style the header row (row 1) ─────────────────────────────────────────
-    const headerRow = sheet.getRow(1);
-    headerRow.height = 24;
-    headerRow.eachCell((cell) => {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF0B2A45" },   // deep navy — matches app brand
-      };
-      cell.font = {
-        bold: true,
-        color: { argb: "FFFFFFFF" },
-        size: 11,
-        name: "Calibri",
-      };
-      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: false };
-      cell.border = {
-        top:    { style: "thin",   color: { argb: "FF1A9BB5" } },
-        bottom: { style: "medium", color: { argb: "FF12A7BC" } },  // teal accent
-        left:   { style: "thin",   color: { argb: "FF1A4A6A" } },
-        right:  { style: "thin",   color: { argb: "FF1A4A6A" } },
-      };
-    });
+      // Default visible line item columns (27 columns)
+      const itemCols = SMARTPAL_COLUMNS.slice(0, 27);
 
-    // ── Add data rows with alternating tint ──────────────────────────────────
-    dataRows.forEach((rowData, rowIdx) => {
-      const row = sheet.addRow(rowData);
-      row.height = 18;
-      const bgArgb = rowIdx % 2 === 0 ? "FFFFFFFF" : "FFF0F7FA";
-      row.eachCell({ includeEmpty: true }, (cell) => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bgArgb } };
-        cell.font = { size: 10, name: "Calibri" };
-        cell.alignment = { vertical: "middle" };
+      // ── 1. Main Column Headers Row ──────────────────────────────────────────
+      const combinedHeaders = ["PO Number", ...itemCols.map(c => c.label.replace(/^\*/, ""))];
+      const headerRow = sheet.addRow(combinedHeaders);
+      headerRow.height = 28;
+
+      headerRow.eachCell((cell, colNumber) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: colNumber === 1 ? "FF0F172A" : "FF1E293B" },
+        };
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 10, name: "Calibri" };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         cell.border = {
-          top:    { style: "hair", color: { argb: "FFD0DDE8" } },
-          bottom: { style: "hair", color: { argb: "FFD0DDE8" } },
-          left:   { style: "hair", color: { argb: "FFD0DDE8" } },
-          right:  { style: "hair", color: { argb: "FFD0DDE8" } },
+          top:    { style: "medium", color: { argb: "FF0F172A" } },
+          bottom: { style: "medium", color: { argb: colNumber === 1 ? "FF0284C7" : "FF38BDF8" } },
+          left:   { style: "thin",   color: { argb: "FF334155" } },
+          right:  colNumber === 1 
+                    ? { style: "medium", color: { argb: "FF38BDF8" } } 
+                    : { style: "thin",   color: { argb: "FF334155" } },
         };
       });
-    });
 
-    // ── Download as .xlsx ─────────────────────────────────────────────────────
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const today = new Date().toISOString().split("T")[0];
-    link.href = url;
-    link.download = `purchase_orders_${today}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // ── 2. Add PO Groups ────────────────────────────────────────────────────
+      const PO_BG_EVEN   = "FFF0F9FF"; // Sky 50
+      const PO_BG_ODD    = "FFF8FAFC"; // Slate 50
+      const ITEM_BG_EVEN = "FFFFFFFF"; // White
+      const ITEM_BG_ODD  = "FFF8FAFC"; // Soft grey
+
+      const GRP_BORDER_DARK = { style: "medium", color: { argb: "FF475569" } };
+      const INNER_BORDER    = { style: "thin",   color: { argb: "FFE2E8F0" } };
+
+      exportRows.forEach((row, groupIdx) => {
+        const poData = visibleColumns.map(c => row.getValue(c.id));
+        const poNumber  = row.getValue("po_number");
+        const poDetails = poMap.get(poNumber);
+        const items     = (poDetails && poDetails.line_items && poDetails.line_items.length > 0)
+          ? poDetails.line_items : [];
+
+        const poBg = groupIdx % 2 === 0 ? PO_BG_EVEN : PO_BG_ODD;
+        const startRowIndex = sheet.rowCount + 1;
+
+        // ── Block Row 1: PO Details Summary ───────────────────────────────────
+        const poFieldMap = {};
+        visibleColumns.forEach((c, i) => {
+          poFieldMap[c.id] = poData[i] === null || poData[i] === undefined ? "" : poData[i];
+        });
+        const fmt  = (v) => (v === "" ? "—" : String(v));
+        
+        const summaryParts = [];
+        visibleColumns.forEach(c => {
+          if (c.id !== "po_number") {
+             summaryParts.push(`${c.columnDef.header || c.id}: ${fmt(poFieldMap[c.id])}`);
+          }
+        });
+        const poSummary = summaryParts.join("   |   ");
+
+        const poDetailRowData = new Array(combinedHeaders.length).fill("");
+        poDetailRowData[0] = poNumber;
+        poDetailRowData[1] = poSummary;
+        
+        const summaryRow = sheet.addRow(poDetailRowData);
+        summaryRow.height = 26;
+
+        // Merge from Col 2 to Last Col for the summary
+        sheet.mergeCells(startRowIndex, 2, startRowIndex, combinedHeaders.length);
+        const summaryCell = sheet.getCell(startRowIndex, 2);
+        summaryCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0F2FE" } }; // Sky 100
+        summaryCell.font = { bold: true, color: { argb: "FF0F172A" }, size: 9.5, name: "Calibri" };
+        summaryCell.alignment = { vertical: "middle", horizontal: "left", wrapText: true };
+        summaryCell.border = {
+          top: GRP_BORDER_DARK,
+          bottom: INNER_BORDER,
+          left: GRP_BORDER_DARK,
+          right: GRP_BORDER_DARK,
+        };
+
+        // ── Block Row 2..N: Line Items ────────────────────────────────────────
+        const itemCount = items.length > 0 ? items.length : 1;
+        
+        for (let itemIdx = 0; itemIdx < itemCount; itemIdx++) {
+          const item = items.length > 0 ? items[itemIdx] : null;
+          const isLastInGroup  = itemIdx === itemCount - 1;
+          
+          const itemColValues = itemCols.map(c => {
+            if (!item) return "";
+            const val = c.isRaw ? item.extra_fields?.[c.label] : item[c.field];
+            return val === null || val === undefined ? "" : val;
+          });
+
+          // Col 1 is empty because it will be merged with the top row's Col 1
+          const itemRowData = ["", ...itemColValues];
+          const r = sheet.addRow(itemRowData);
+          r.height = 20;
+
+          r.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            if (colNumber === 1) return; // Handled by vertical merge styling
+
+            const itemBg  = itemIdx % 2 === 0 ? ITEM_BG_EVEN : ITEM_BG_ODD;
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: itemBg } };
+            cell.font = { size: 9.5, name: "Calibri", color: { argb: "FF1E293B" } };
+
+            let isNumericCol = false;
+            let numFormat = undefined;
+            const itemColDef = itemCols[colNumber - 2]; 
+            
+            if (itemColDef?.isNumeric) {
+              isNumericCol = true;
+              numFormat = ["rob", "qty", "lead_days"].includes(itemColDef.field) ? "#,##0" : "#,##0.00";
+            }
+
+            if (isNumericCol && cell.value !== "" && cell.value !== null && !isNaN(Number(cell.value))) {
+              cell.value = Number(cell.value);
+              if (numFormat) cell.numFmt = numFormat;
+            }
+
+            if (isNumericCol) {
+              cell.alignment = { vertical: "middle", horizontal: "right" };
+            } else {
+              const isCenter = ["s_no", "part_number", "item_code", "uom", "account_code"].includes(itemColDef?.field || itemColDef?.label);
+              cell.alignment = { vertical: "middle", horizontal: isCenter ? "center" : "left", wrapText: true };
+            }
+
+            cell.border = {
+              top:    INNER_BORDER,
+              bottom: isLastInGroup ? GRP_BORDER_DARK : INNER_BORDER,
+              left:   colNumber === 2 ? GRP_BORDER_DARK : INNER_BORDER,
+              right:  colNumber === combinedHeaders.length ? GRP_BORDER_DARK : INNER_BORDER,
+            };
+          });
+          
+          if (items.length === 0) {
+             sheet.mergeCells(r.number, 2, r.number, combinedHeaders.length);
+             const emptyCell = sheet.getCell(r.number, 2);
+             emptyCell.value = "No line items recorded.";
+             emptyCell.alignment = { horizontal: "center", vertical: "middle" };
+             emptyCell.font = { italic: true, color: { argb: "FF64748B" } };
+             emptyCell.border = {
+               top: INNER_BORDER,
+               bottom: GRP_BORDER_DARK,
+               left: GRP_BORDER_DARK,
+               right: GRP_BORDER_DARK,
+             };
+          }
+        }
+
+        const endRowIndex = sheet.rowCount;
+
+        // ── Vertically Merge Col 1 (PO Number) ────────────────────────────────
+        sheet.mergeCells(startRowIndex, 1, endRowIndex, 1);
+        const masterPoCell = sheet.getCell(startRowIndex, 1);
+        masterPoCell.value = poNumber;
+        masterPoCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: poBg } };
+        masterPoCell.font = { bold: true, size: 10, name: "Calibri", color: { argb: "FF0F172A" } };
+        masterPoCell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        masterPoCell.border = {
+          top: GRP_BORDER_DARK,
+          bottom: GRP_BORDER_DARK,
+          left: GRP_BORDER_DARK,
+          right: GRP_BORDER_DARK,
+        };
+      });
+
+      // ── 3. Auto-fit column widths with intelligent padding ─────────────────
+      sheet.columns.forEach((column, colIdx) => {
+        let maxLen = 10;
+        
+        // Measure header
+        const headerCell = sheet.getCell(1, colIdx + 1);
+        if (headerCell.value) {
+          maxLen = Math.max(maxLen, String(headerCell.value).length);
+        }
+
+        // Measure content cells
+        column.eachCell({ includeEmpty: false }, (cell, rowNumber) => {
+          if (rowNumber === 1) return;
+          // Skip the merged PO details summary row, which spans col 2 to end
+          if (cell.isMerged && colIdx > 0) return; 
+          
+          if (cell.value !== null && cell.value !== undefined) {
+            const strVal = String(cell.value);
+            const lines = strVal.split("\n");
+            lines.forEach(l => {
+              maxLen = Math.max(maxLen, Math.min(l.length, 50));
+            });
+          }
+        });
+
+        column.width = Math.min(Math.max(maxLen + 3, 12), 50);
+      });
+
+      // ── 4. Download .xlsx file ─────────────────────────────────────────────
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const today = new Date().toISOString().split("T")[0];
+      link.href = url;
+      link.download = `purchase_orders_with_items_${today}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } finally {
+      document.body.style.cursor = "default";
+    }
   }, [tableInstance]);
 
   const vesselOptions = useMemo(() => {
@@ -137,12 +298,6 @@ export function PurchaseOrdersPage() {
     if (!rows?.length) return [{ value: "", label: "All Categories" }];
     const unique = [...new Set(rows.map((r) => r.category).filter(Boolean))].sort();
     return [{ value: "", label: "All Categories" }, ...unique.map(c => ({ value: c, label: c }))];
-  }, [rows]);
-
-  const stats = useMemo(() => {
-    if (!rows?.length) return null;
-    const vessels    = new Set(rows.map((r) => r.vessel).filter(Boolean));
-    return { count: rows.length, vessels: vessels.size };
   }, [rows]);
 
   const filteredRows = useMemo(() => {
@@ -170,7 +325,11 @@ export function PurchaseOrdersPage() {
     });
   }, [rows, poFilter, vesselFilter, categoryFilter, createdDateFrom, createdDateTo]);
 
-  const isFiltered = 
+  const stats = useMemo(() => {
+    if (!rows?.length) return null;
+    const vessels    = new Set(rows.map((r) => r.vessel).filter(Boolean));
+    return { count: rows.length, vessels: vessels.size };
+  }, [rows]);  const isFiltered = 
     poFilter !== "" || 
     vesselFilter !== "" || 
     categoryFilter !== "" || 
@@ -324,6 +483,12 @@ export function PurchaseOrdersPage() {
           />
         )}
       </div>
+
+      {isFiltered && (
+        <div className={styles.filterSummary}>
+          Showing <strong>{filteredRows.length.toLocaleString()}</strong> result{filteredRows.length !== 1 ? "s" : ""} out of {rows.length.toLocaleString()} total orders
+        </div>
+      )}
 
       {/* ══ TABLE ══════════════════════════════════════════════════════════ */}
       <div className={styles.tableArea}>

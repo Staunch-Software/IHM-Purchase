@@ -56,10 +56,18 @@
   color: var(--text-muted);
   pointer-events: none;
   z-index: 1;
+  transition: all 0.3s var(--ease-out-quint, ease);
 }
 
 .active .icon {
   color: var(--teal-700);
+}
+
+.open .icon,
+.trigger:focus-visible .icon {
+  color: var(--color-accent, var(--teal-600));
+  transform: scale(1.1);
+  transition: all 0.3s var(--ease-out-quint, ease);
 }
 
 .label {

@@ -113,6 +113,7 @@ export const poColumns = [
 
   // ── Vendor ─────────────────────────────────────────────────────────────────
   textCol("vendor_name",         "Vendor",                  { size: 260 }),
+  { id: "vendor_email", accessorFn: (r) => r.vendor_email ?? undefined, header: "Vendor Email", size: 240, minSize: 240, sortUndefined: "last", meta: { filterType: "text" } },
   textCol("revision_no",         "Revision No.",            { size: 155 }),
   textCol("insurance_claim_no",  "Insurance Claim No.",     { size: 210 }),
   { id: "transfer_method", accessorFn: (r) => r.transfer_method ?? undefined, header: "Transfer Method", size: 175, minSize: 175, sortUndefined: "last", meta: { filterType: "select" } },
@@ -211,6 +212,7 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   "items_count",           // Items
   "title",                 // Title
   "vendor_name",           // Vendor
+  "vendor_email",          // Vendor Email
   "currency",              // Base Currency
   "base_currency_amount",  // Base Amount
   "account_code",          // Account Code

@@ -275,12 +275,65 @@ async def extract_line_items(page: Page) -> list[dict]:
     return items
 
 
+async def extract_vendor_email(page: Page) -> str | None:
+    try:
+        # Click the "Profile" link
+        await page.evaluate("""() => {
+            const links = Array.from(document.querySelectorAll("a"));
+            const profileLink = links.find(l => l.innerText.trim() === "Profile");
+            if (profileLink) profileLink.click();
+        }""")
+        
+        # Wait for the modal dialog to be visible
+        await page.wait_for_selector(".modal-title:has-text('Profile')", state="visible", timeout=10000)
+        await page.wait_for_timeout(1000) # Wait for knockoutjs data-binds
+
+        
+        # Extract the email
+        email = await page.evaluate("""() => {
+            const visibleModals = Array.from(document.querySelectorAll(".modal-dialog")).filter(m => m.offsetWidth > 0 && m.offsetHeight > 0);
+            if (visibleModals.length === 0) return null;
+            const activeModal = visibleModals[visibleModals.length - 1]; // Top-most modal
+            
+            const labels = Array.from(activeModal.querySelectorAll("label"));
+            const emailLabel = labels.find(l => l.innerText.trim() === "Email");
+            if (emailLabel && emailLabel.parentElement) {
+                const p = emailLabel.parentElement.querySelector("p");
+                return p ? p.innerText.trim() : null;
+            }
+            return null;
+        }""")
+        
+        # Click the close button
+        await page.evaluate("""() => {
+            const visibleModals = Array.from(document.querySelectorAll(".modal-dialog")).filter(m => m.offsetWidth > 0 && m.offsetHeight > 0);
+            if (visibleModals.length > 0) {
+                const closeBtn = visibleModals[visibleModals.length - 1].querySelector("button.close");
+                if (closeBtn) closeBtn.click();
+            }
+        }""")
+        
+        # Wait for it to close
+        await page.wait_for_selector(".modal-title:has-text('Profile')", state="hidden", timeout=10000)
+        
+        return email
+    except Exception as e:
+        logger.warning(f"Could not extract vendor email: {e}")
+        return None
+
+
 async def scrape_current_po_detail(page: Page, po_number: str) -> dict:
     """Assumes `page` has ALREADY navigated to a PO's detail page (i.e. the
     caller just clicked the PO Number link). Extracts and returns its data
     — does NOT navigate away; the caller is responsible for `go_back()`."""
     await wait_for_detail_page_ready(page)
+    
+    vendor_email = await extract_vendor_email(page)
+    
     header_fields = await extract_header_fields(page)
+    if vendor_email:
+        header_fields["_raw_detail_fields"]["Vendor Email"] = vendor_email
+        
     line_items = await extract_line_items(page)
     logger.info(f"Scraped detail for {po_number}: {len(line_items)} line item(s).")
     return {"po_number": po_number, "header_fields": header_fields, "line_items": line_items}

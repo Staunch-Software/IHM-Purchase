@@ -44,3 +44,15 @@ async def get_purchase_order_detail(db: AsyncSession, po_number: str) -> Purchas
     )
     result = await db.execute(stmt)
     return result.scalars().first()
+
+
+async def get_purchase_orders_bulk_detail(db: AsyncSession, po_numbers: list[str]) -> list[PurchaseOrder]:
+    if not po_numbers:
+        return []
+    stmt = (
+        select(PurchaseOrder)
+        .where(PurchaseOrder.po_number.in_(po_numbers))
+        .options(selectinload(PurchaseOrder.line_items))
+    )
+    result = await db.execute(stmt)
+    return list(result.scalars().all())

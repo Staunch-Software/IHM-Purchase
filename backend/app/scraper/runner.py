@@ -23,7 +23,12 @@ resumes, skipping POs already completed earlier in this run, up to
 MAX_BROWSER_RESTARTS times.
 """
 import asyncio
+import os
 from datetime import datetime
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"))
+
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

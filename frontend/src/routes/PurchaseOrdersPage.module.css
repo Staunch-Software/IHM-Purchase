@@ -375,6 +375,17 @@
 /* ══════════════════════════════════════════════════════════════════════════
    SECTION 3 — TABLE AREA
    ══════════════════════════════════════════════════════════════════════════ */
+
+.filterSummary {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-5) var(--space-3) var(--space-5);
+}
+.filterSummary strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .tableArea {
   flex: 1;
   min-height: 0;

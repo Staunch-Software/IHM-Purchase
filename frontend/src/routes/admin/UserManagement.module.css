@@ -484,6 +484,7 @@
   left: 14px;
   color: var(--text-muted);
   pointer-events: none;
+  z-index: 1;
   transition: all 0.3s var(--ease-out-quint);
 }
 
@@ -497,7 +498,7 @@
   padding: 10px 14px 10px 38px;
   
   /* Refined Input Design */
-  background: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--radius-lg);
   font-size: var(--font-size-base);
@@ -507,33 +508,55 @@
 }
 
 .formInput:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
 }
 
 .formInput:focus {
   outline: none;
-  background: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 1);
   border-color: var(--color-accent);
   box-shadow: 0 0 0 4px rgba(18, 167, 188, 0.15), inset 0 1px 2px rgba(0,0,0,0.02);
   transform: translateY(-1px);
 }
 
 .formInput:disabled {
-  background: rgba(0, 0, 0, 0.02);
+  background-color: rgba(0, 0, 0, 0.02);
   color: var(--text-disabled);
   cursor: not-allowed;
 }
 
-select.formInput {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2312A7BC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5L8 10.5L12 6.5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 16px;
-  padding-right: 38px;
-  cursor: pointer;
+.customRoleSelectWrap {
+  width: 100%;
+}
+.customRoleSelectWrap > div {
+  width: 100%;
+}
+
+.customRoleSelect {
+  width: 100%;
+  height: 42px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.3s var(--ease-out-quint);
+}
+
+.customRoleSelect:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* We target the open state class (from Select.module.css it usually adds .open, or uses aria-expanded) */
+.customRoleSelect:focus-visible,
+.customRoleSelect[aria-expanded="true"] {
+  outline: none;
+  background-color: rgba(255, 255, 255, 1) !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 4px rgba(18, 167, 188, 0.15), inset 0 1px 2px rgba(0,0,0,0.02) !important;
 }
 
 .formInputPassword {

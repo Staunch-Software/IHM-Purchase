@@ -36,6 +36,11 @@ async def login(page: Page) -> bool:
         logger.info("Navigating to SmartPAL...")
         await page.goto(settings.SMARTPAL_BASE_URL, timeout=120000)
 
+        if "login.microsoftonline.com" not in page.url and not await page.get_by_text("Login with your Microsoft account").is_visible():
+            if "Landing" in page.url or "Dashboard" in page.url:
+                logger.info("Already logged in.")
+                return True
+
         await page.get_by_text("Login with your Microsoft account").click(timeout=15000)
         await page.wait_for_url("**/login.microsoftonline.com/**", timeout=15000)
 

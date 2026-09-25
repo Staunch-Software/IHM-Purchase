@@ -255,6 +255,19 @@ export function PODetailSheet({ poNumber, onClose }) {
               <Section icon={Building2} title="Vendor">
                 <Field label="Vendor Name" value={formatText(po.vendor_name)} />
                 <Field label="Vendor Reference" value={formatText(po.vendor_reference)} />
+                {(() => {
+                  if (!po.extra_fields || !po.extra_fields.detail_raw) return null;
+                  const raw = po.extra_fields.detail_raw;
+                  const emailKey = Object.keys(raw).find(k => 
+                    k.toLowerCase() === 'vendor email' || 
+                    k.toLowerCase() === 'email' || 
+                    k.toLowerCase() === 'vendor e-mail'
+                  );
+                  if (emailKey && raw[emailKey]) {
+                    return <Field label="Vendor Email" value={formatText(raw[emailKey])} />;
+                  }
+                  return null;
+                })()}
                 <Field label="Payment Terms" value={formatText(po.payment)} />
                 <Field
                   label="Payment Due"

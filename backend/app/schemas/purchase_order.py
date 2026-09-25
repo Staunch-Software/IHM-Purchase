@@ -61,6 +61,7 @@ class PurchaseOrderListItem(BaseModel):
     items_count: int | None
     title: str | None
     vendor_name: str | None
+    vendor_email: str | None
     base_currency_amount: float | None
     currency: str | None
     grand_total: float | None
@@ -149,3 +150,7 @@ class PurchaseOrderDetail(PurchaseOrderListItem):
 class PurchaseOrderListResponse(BaseModel):
     total: int
     items: list[PurchaseOrderListItem]
+
+
+class BulkPODetailRequest(BaseModel):
+    po_numbers: list[str]

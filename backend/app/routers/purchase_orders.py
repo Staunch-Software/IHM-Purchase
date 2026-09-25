@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.deps.auth import get_current_user
-from app.schemas.purchase_order import PurchaseOrderDetail, PurchaseOrderListResponse
+from app.schemas.purchase_order import BulkPODetailRequest, PurchaseOrderDetail, PurchaseOrderListResponse
 from app.services import purchase_order_service
 
 router = APIRouter(prefix="/po", tags=["purchase-orders"], dependencies=[Depends(get_current_user)])
@@ -33,3 +33,10 @@ async def get_purchase_order_endpoint(po_number: str, db: AsyncSession = Depends
     if not po:
         raise HTTPException(status_code=404, detail="Purchase order not found")
     return po
+
+
+@router.post("/bulk-details", response_model=list[PurchaseOrderDetail])
+async def get_purchase_orders_bulk_detail_endpoint(
+    request: BulkPODetailRequest, db: AsyncSession = Depends(get_db)
+):
+    return await purchase_order_service.get_purchase_orders_bulk_detail(db, request.po_numbers)

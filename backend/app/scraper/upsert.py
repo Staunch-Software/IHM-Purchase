@@ -137,6 +137,8 @@ async def upsert_po_detail(db: AsyncSession, po_number: str, header_fields: dict
         await db.flush()
 
     po.vendor_name = header_fields.get("vendor_name") or po.vendor_name
+    if header_fields.get("_raw_detail_fields") and header_fields["_raw_detail_fields"].get("Vendor Email"):
+        po.vendor_email = header_fields["_raw_detail_fields"].get("Vendor Email")
     po.title = header_fields.get("title") or po.title
     po.priority = header_fields.get("priority") or po.priority
     po.delivery_port = header_fields.get("delivery_port") or po.delivery_port
