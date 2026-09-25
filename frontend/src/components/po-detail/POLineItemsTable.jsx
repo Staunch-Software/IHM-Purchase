@@ -16,20 +16,11 @@ export const SMARTPAL_COLUMNS = [
   { label: "Part Number",              field: "part_number",         isNumeric: false, isRaw: false },
   { label: "Item Description",         field: "item_description",    isNumeric: false, isRaw: false },
   { label: "ROB",                      field: "rob",                 isNumeric: true,  isRaw: false },
-  { label: "*Unit Price",              field: "unit_price",          isNumeric: true,  isRaw: false },
   { label: "*Qty.",                    field: "qty",                 isNumeric: true,  isRaw: false },
-  { label: "Discount %",               field: "discount_pct",        isNumeric: true,  isRaw: false },
-  { label: "Total Amount [USD]",       field: "amount",              isNumeric: true,  isRaw: false },
-  { label: "Account Code",             field: "account_code",        isNumeric: false, isRaw: false },
   { label: "Plate/Drawing Number",     field: "plate_drawing_number",isNumeric: false, isRaw: false },
   { label: "MED Approval Required",    field: null,                  isNumeric: false, isRaw: true  },
   { label: "UOM",                      field: "uom",                 isNumeric: false, isRaw: false },
-  { label: "Contract Price",           field: null,                  isNumeric: true,  isRaw: true  },
   { label: "Transit Qty.",             field: null,                  isNumeric: true,  isRaw: true  },
-  { label: "VAT",                      field: null,                  isNumeric: false, isRaw: true  },
-  { label: "VAT %",                    field: null,                  isNumeric: true,  isRaw: true  },
-  { label: "Sub Account Code",         field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Analysis Code",            field: null,                  isNumeric: false, isRaw: true  },
   { label: "Client Code",              field: null,                  isNumeric: false, isRaw: true  },
   { label: "Lead Days",                field: "lead_days",           isNumeric: false, isRaw: false },
   { label: "Readiness Date",           field: "readiness_date",      isNumeric: false, isRaw: false },
@@ -49,16 +40,8 @@ export const SMARTPAL_COLUMNS = [
   { label: "Brand",                    field: "brand",               isNumeric: false, isRaw: false },
   { label: "Weight",                   field: "weight",              isNumeric: false, isRaw: false },
   { label: "PKG UOM",                  field: null,                  isNumeric: false, isRaw: true  },
-  { label: "*Cost Centre/WBS",         field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Net Discount",             field: null,                  isNumeric: true,  isRaw: true  },
-  { label: "Adj. Unit Price",          field: null,                  isNumeric: true,  isRaw: true  },
   { label: "Authenticity of Product",  field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Unbudgeted Cost ?",        field: null,                  isNumeric: false, isRaw: true  },
-  { label: "*Cost Remarks",            field: null,                  isNumeric: false, isRaw: true  },
   { label: "Project Code",             field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Alt. Account Code",        field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Alt. Sub Account Code",    field: null,                  isNumeric: false, isRaw: true  },
-  { label: "Alt. Analysis Code",       field: null,                  isNumeric: false, isRaw: true  },
   { label: "MD Required",              field: null,                  isNumeric: false, isRaw: true  },
   { label: "SDoc Required",            field: null,                  isNumeric: false, isRaw: true  },
   { label: "URL",                      field: null,                  isNumeric: false, isRaw: true  },
@@ -76,10 +59,10 @@ export const SMARTPAL_COLUMNS = [
   { label: "Remarks From Vessel",      field: "remarks_from_vessel", isNumeric: false, isRaw: false },
 ];
 
-// First 27 entries above are SmartPAL's default-visible columns; the rest
+// First 18 entries above are SmartPAL's default-visible columns; the rest
 // are hidden by default there too — mirror that here instead of dumping
-// all 60 columns on screen at once.
-const DEFAULT_VISIBLE_COUNT = 27;
+// all columns on screen at once.
+const DEFAULT_VISIBLE_COUNT = 18;
 
 /**
  * These two carry the row's identity, so they stay pinned and unhideable.

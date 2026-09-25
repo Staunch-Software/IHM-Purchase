@@ -87,8 +87,8 @@ export function PODetailSheet({ poNumber, onClose }) {
     const details = [
       ["Vendor Name", po.vendor_name || "—", "Vessel", po.vessel || "—"],
       ["Status", po.status || "—", "Category", po.category || "—"],
-      ["Approved Date", po.approved_date ? formatDate(po.approved_date) : "—", "Grand Total", po.grand_total ? formatMoney(po.grand_total) : "—"],
-      ["Delivery Port", po.delivery_port || "—", "Currency", po.currency || "—"]
+      ["Approved Date", po.approved_date ? formatDate(po.approved_date) : "—", "", ""],
+      ["Delivery Port", po.delivery_port || "—", "", ""]
     ];
     
     details.forEach((row) => {
@@ -104,8 +104,8 @@ export function PODetailSheet({ poNumber, onClose }) {
     // ── 2. Line Items Section ────────────────────────────────────────────────
     const startRow = sheet.rowCount + 1;
     
-    // We export the first 27 columns (SmartPAL default visible)
-    const cols = SMARTPAL_COLUMNS.slice(0, 27); 
+    // We export the first 18 columns (SmartPAL default visible)
+    const cols = SMARTPAL_COLUMNS.slice(0, 18); 
     const headerRow = sheet.addRow(cols.map(c => c.label));
     headerRow.height = 24;
     headerRow.eachCell((cell) => {
@@ -268,23 +268,8 @@ export function PODetailSheet({ poNumber, onClose }) {
                   }
                   return null;
                 })()}
-                <Field label="Payment Terms" value={formatText(po.payment)} />
-                <Field
-                  label="Payment Due"
-                  value={po.payment_due_after_days ? `${po.payment_due_after_days} days` : "—"}
-                />
               </Section>
 
-              <Section icon={CircleDollarSign} title="Financials">
-                <Field label="Grand Total" value={formatMoney(po.grand_total)} mono />
-                <Field label="Amount (USD)" value={formatMoney(po.base_currency_amount)} mono />
-                <Field label="Currency" value={formatText(po.currency)} mono />
-                <Field
-                  label="Exchange Rate"
-                  value={po.exch_rate ? Number(po.exch_rate).toFixed(4) : "—"}
-                  mono
-                />
-              </Section>
 
               <Section icon={CalendarDays} title="Dates">
                 <Field label="Approved Date" value={formatDate(po.approved_date)} />

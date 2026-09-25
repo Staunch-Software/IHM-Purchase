@@ -119,14 +119,8 @@ export const poColumns = [
   { id: "transfer_method", accessorFn: (r) => r.transfer_method ?? undefined, header: "Transfer Method", size: 175, minSize: 175, sortUndefined: "last", meta: { filterType: "select" } },
 
   // ── Financials ─────────────────────────────────────────────────────────────
-  { id: "currency", accessorFn: (r) => r.currency ?? undefined, header: "Base Currency", size: 155, minSize: 155, sortUndefined: "last", meta: { filterType: "select" } },
-  numCol("base_currency_amount",  "Base Amount",            (info) => formatAmount(info.getValue()), 145),
   textCol("organisation_assignment", "Organisation Assignment", { size: 230 }),
   textCol("po_update",            "PO Update",              { size: 140 }),
-  textCol("account_re_allocation","Account Re-Allocation",  { size: 210 }),
-  textCol("account_code",         "Account Code",           { size: 155 }),
-  textCol("analysis_code",        "Analysis Code",          { size: 160 }),
-  textCol("cost_centre_wbs",      "Cost Centre/WBS",        { size: 180 }),
   textCol("afe_po",               "AFE PO",                 { size: 110 }),
   textCol("afe_status",           "AFE Status",             { size: 130 }),
 
@@ -181,15 +175,7 @@ export const poColumns = [
   textCol("ar_invoice_no",       "AR Invoice No.",      { size: 165 }),
 
   // ── Detail-page fields (from PO header, not list grid) ─────────────────────
-  numCol("grand_total",          "Grand Total",         (info) => formatAmount(info.getValue()), 145),
   textCol("vendor_reference",    "Vendor Reference",    { size: 185 }),
-  numCol("exch_rate",            "Exch. Rate",          (info) => {
-    const v = info.getValue();
-    if (v === null || v === undefined || v === "") return "";
-    return Number(v).toFixed(4);
-  }, 120),
-  { id: "payment",       accessorFn: (r) => r.payment       ?? undefined, header: "Payment",       size: 130, minSize: 130, sortUndefined: "last", meta: { filterType: "select" } },
-  numCol("payment_due_after_days","Payment Due (Days)", (info) => formatInt(info.getValue()), 190),
   { id: "entity",        accessorFn: (r) => r.entity        ?? undefined, header: "Entity",        size: 120, minSize: 120, sortUndefined: "last", meta: { filterType: "select" } },
   { id: "delivery_port", accessorFn: (r) => r.delivery_port ?? undefined, header: "Delivery Port", size: 165, minSize: 165, sortUndefined: "last", meta: { filterType: "select" } },
   { id: "delivery_terms",accessorFn: (r) => r.delivery_terms?? undefined, header: "Delivery Terms",size: 175, minSize: 175, sortUndefined: "last", meta: { filterType: "select" } },
@@ -213,10 +199,6 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   "title",                 // Title
   "vendor_name",           // Vendor
   "vendor_email",          // Vendor Email
-  "currency",              // Base Currency
-  "base_currency_amount",  // Base Amount
-  "account_code",          // Account Code
-  "account_re_allocation", // Account Re-Allocation
   "created_by",            // Created By
   "approved_by",           // Approved By
   "status",                // Status
