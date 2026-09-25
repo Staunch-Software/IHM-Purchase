@@ -9,7 +9,7 @@ from app.models.purchase_order import PurchaseOrder
 from app.scraper.browser import launch_context
 from app.scraper.login import login
 from app.scraper.po_overview_scraper import open_po_overview, click_finally_approved_tab, apply_date_filter
-from app.scraper.po_detail_scraper import extract_vendor_email
+from app.scraper.po_detail_scraper import extract_vendor_email, wait_for_detail_page_ready
 
 async def main():
     async with SessionLocal() as db:
@@ -94,7 +94,7 @@ async def main():
                                 continue
                             
                             # Wait for detail page
-                            await page.wait_for_selector("#divPODetails, .panel-heading:has-text('Purchase Order Details')", timeout=20000)
+                            await wait_for_detail_page_ready(page)
                             await page.wait_for_timeout(1500) # Wait a bit for bindings
                             
                             email = await extract_vendor_email(page)
